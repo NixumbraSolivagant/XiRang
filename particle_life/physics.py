@@ -132,9 +132,9 @@ def integrate(
     pos_x.add_(vel_x)
     pos_y.add_(vel_y)
 
-    # Periodic wrap — done in-place via masked assignment
-    pos_x.rem_(width)
-    pos_y.rem_(height)
-    # Clamp any negative remainders that rem_ can produce on some PyTorch versions
-    pos_x.clamp_(min=0.0)
-    pos_y.clamp_(min=0.0)
+    # Periodic wrap — using fmod for in-place modulo
+    pos_x.fmod_(width)
+    pos_y.fmod_(height)
+    # Shift negatives into [0, width/height)
+    pos_x.add_(width * (pos_x < 0).float())
+    pos_y.add_(height * (pos_y < 0).float())

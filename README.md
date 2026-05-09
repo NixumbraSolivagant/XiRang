@@ -89,9 +89,44 @@ XiRang/
     ├── particle_types.py    # GPU tensor state
     ├── spatial_hash.py      # O(N) neighbour lookup
     ├── physics.py           # Vectorised force kernel
+    ├── fitness.py           # Complexity metrics
+    ├── cmaes.py             # CMA-ES optimiser
+    ├── evolver.py           # Evolution driver
     ├── engine.py            # Simulation driver
     ├── renderer.py          # Pygame GUI renderer
     └── headless_recorder.py # PIL frame writer
+```
+
+---
+
+## Evolution (CMA-ES)
+
+Optimise the 4×4 interaction matrix for maximal structural complexity using
+CMA-ES — no neural networks, no gradients, ~16 parameters.
+
+```bash
+# Fast evaluation on CPU (100k particles, ~30min on 1 GPU)
+python main.py --evolve -n 100000 --evolve-gens 200
+
+# Resume from checkpoint
+python main.py --evolve --evolve-best best_matrix.npy
+```
+
+**Fitness function** (weighted sum, all on GPU):
+
+| Metric | Weight | Measures |
+|---|---|---|
+| Local spatial entropy | 0.35 | Clustering strength |
+| Velocity variance | 0.25 | Ordered motion |
+| Type diversity | 0.25 | Cross-type mixing |
+| Inter-type correlation | 0.15 | Cross-species edges |
+
+Record best matrix after evolution:
+
+```bash
+python main.py --evolve -n 100000 --evolve-record --steps 300
+ffmpeg -framerate 60 -i evolve_best_frames/frame_%06d.png \
+       -c:v libx264 -pix_fmt yuv420p evolve_best.mp4
 ```
 
 ---

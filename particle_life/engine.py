@@ -77,6 +77,17 @@ class SimulationEngine:
         self.frame = 0
         print("[Engine] Ready.")
 
+    def reset_state(self):
+        """Re-randomise particle positions/velocities/types without reallocating buffers."""
+        st = self.state
+        st.positions_x.uniform_(0, self.cfg.width)
+        st.positions_y.uniform_(0, self.cfg.height)
+        st.velocities_x.zero_()
+        st.velocities_y.zero_()
+        st.types = torch.randint(0, self.cfg.num_types, (st.n,),
+                                dtype=torch.int64, device=self.device)
+        self.frame = 0
+
     # ── Interaction Matrix ────────────────────────────────────────────────────
 
     def mutate_matrix(self, matrix: Optional[np.ndarray] = None):

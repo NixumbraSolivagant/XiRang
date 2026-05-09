@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.npy
+evolve_log.json
+frames/
+evolve_best_frames/
+best_matrix.npy
+*.mp4
+*.png

@@ -38,7 +38,7 @@ class ParticleState:
     def _random_init(self, width: float, height: float, num_types: int):
         self.positions_x.uniform_(0, width)
         self.positions_y.uniform_(0, height)
-        self.types.random_(low=0, high=num_types)
+        self.types = torch.randint(0, num_types, (self.n,), dtype=torch.int64, device=self.device)
 
     def reset_forces(self):
         self.forces_x.zero_()
@@ -71,7 +71,7 @@ class ParticleState:
         vy = torch.zeros(count, dtype=torch.float32, device=self.device)
         fx = torch.zeros(count, dtype=torch.float32, device=self.device)
         fy = torch.zeros(count, dtype=torch.float32, device=self.device)
-        tp = torch.empty(count, dtype=torch.int64, device=self.device)
+        tp = torch.randint(0, num_types, (count,), dtype=torch.int64, device=self.device)
 
         if radius is not None and cx is not None and cy is not None:
             r = torch.sqrt(torch.rand(count, device=self.device)) * radius
@@ -81,8 +81,6 @@ class ParticleState:
         else:
             px.uniform_(0, width)
             py.uniform_(0, height)
-
-        tp.random_(low=0, high=num_types)
 
         # Concatenate
         self.positions_x = torch.cat([self.positions_x, px])
